@@ -4,7 +4,14 @@
 }:
 
 {
-  packages = with pkgs; [ bun ];
+  packages = with pkgs; [
+    bun
+    cargo-watch
+    diesel-cli
+    sqlite
+  ];
+
+  dotenv.enable = true;
 
   languages.rust = {
     enable = true;

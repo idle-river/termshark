@@ -7,9 +7,10 @@ import {
 
 type AppPageShellProps = {
   title: string;
+  children?: React.ReactNode;
 };
 
-export function AppPageShell({ title }: AppPageShellProps) {
+export function AppPageShell({ title, children }: AppPageShellProps) {
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -19,6 +20,7 @@ export function AppPageShell({ title }: AppPageShellProps) {
         </header>
         <main className="p-6">
           <h1 className="text-3xl font-semibold tracking-tight">{title}</h1>
+          {children && <div className="mt-6">{children}</div>}
         </main>
       </SidebarInset>
     </SidebarProvider>

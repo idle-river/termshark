@@ -2,13 +2,18 @@ import "./globals.css";
 import { Figtree } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { Toaster } from "@/components/ui/toast";
+import { QueryProvider } from "@/components/react-query";
 
 const figtree = Figtree({ subsets: ["latin"], variable: "--font-sans" });
 
 function Providers({ children }: { children: React.ReactNode }) {
   return (
     <>
-      <TooltipProvider>{children}</TooltipProvider>
+      <QueryProvider>
+        <Toaster />
+        <TooltipProvider>{children}</TooltipProvider>
+      </QueryProvider>
     </>
   );
 }
