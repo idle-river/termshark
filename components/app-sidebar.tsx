@@ -57,20 +57,21 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent>
         <SidebarMenu className="px-2">
           {data.map((item) => (
-            <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton
-                aschild
-                isActive={pathname === item.url}
-                className="border border-transparent data-active:border-sidebar-primary/30 data-active:bg-sidebar-primary/7 data-active:text-sidebar-primary hover:data-active:bg-sidebar-primary/20"
+            <SidebarMenuItem>
+              <Link
+                className="flex flex-row items-center"
+                key={item.title}
+                href={item.url}
               >
-                <Link
-                  className="flex flex-row items-center gap-2"
-                  href={item.url}
+                <SidebarMenuButton
+                  aschild="true"
+                  isActive={pathname === item.url}
+                  className="border border-transparent data-active:border-sidebar-primary/30 data-active:bg-sidebar-primary/7 data-active:text-sidebar-primary hover:data-active:bg-sidebar-primary/20"
                 >
                   <span className="text-sidebar-primary">{item.icon}</span>
                   {item.title}
-                </Link>
-              </SidebarMenuButton>
+                </SidebarMenuButton>
+              </Link>
             </SidebarMenuItem>
           ))}
         </SidebarMenu>

@@ -5,17 +5,35 @@ use crate::models::Key;
 mod models;
 mod schema;
 
+// #[tauri::command]
+// fn get_keys() -> Result<Vec<Key>, String> {
+//     use self::schema::keys::dsl::*;
+//     let conn = &mut establish_connection();
+//
+//     let ident_keys = keys
+//         .select(Key::as_select())
+//         .load(conn)
+//         .map_err(|err| err.to_string())?;
+//
+//     Ok(ident_keys)
+// }
+
 #[tauri::command]
 fn get_keys() -> Result<Vec<Key>, String> {
-    use self::schema::keys::dsl::*;
-    let conn = &mut establish_connection();
-
-    let ident_keys = keys
-        .select(Key::as_select())
-        .load(conn)
-        .map_err(|err| err.to_string())?;
-
-    Ok(ident_keys)
+    Ok(vec![
+        Key {
+            id: 1,
+            label: "Personal".to_string(),
+            pubkey: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFakePublicKeyPersonal user@termshark".to_string(),
+            privkey: "-----BEGIN OPENSSH PRIVATE KEY-----\nfake-personal-key\n-----END OPENSSH PRIVATE KEY-----".to_string(),
+        },
+        Key {
+            id: 2,
+            label: "Work".to_string(),
+            pubkey: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFakePublicKeyWork user@termshark".to_string(),
+            privkey: "-----BEGIN OPENSSH PRIVATE KEY-----\nfake-work-key\n-----END OPENSSH PRIVATE KEY-----".to_string(),
+        },
+    ])
 }
 
 fn establish_connection() -> SqliteConnection {
