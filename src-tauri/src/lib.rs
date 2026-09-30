@@ -1,4 +1,4 @@
-use diesel::{Connection, QueryDsl, RunQueryDsl, SelectableHelper, SqliteConnection};
+use diesel::{Connection, RunQueryDsl, SelectableHelper, SqliteConnection};
 use dotenvy::dotenv;
 
 use crate::models::Key;
@@ -36,6 +36,25 @@ fn get_keys() -> Result<Vec<Key>, String> {
     ])
 }
 
+#[tauri::command]
+fn create_key(label: String, pubkey: String, privkey: String) -> Result<Key, String> {
+    use self::models::NewKey;
+    use self::schema::keys::dsl::keys;
+
+    let new_key = NewKey {
+        label,
+        pubkey,
+        privkey,
+    };
+    let conn = &mut establish_connection();
+
+    diesel::insert_into(keys)
+        .values(&new_key)
+        .returning(Key::as_returning())
+        .get_result(conn)
+        .map_err(|e| e.to_string())
+}
+
 fn establish_connection() -> SqliteConnection {
     dotenv().ok();
 
@@ -48,7 +67,7 @@ fn establish_connection() -> SqliteConnection {
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
-        .invoke_handler(tauri::generate_handler![get_keys])
+        .invoke_handler(tauri::generate_handler![get_keys, create_key])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
