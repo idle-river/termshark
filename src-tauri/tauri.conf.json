@@ -5,14 +5,14 @@
   "identifier": "org.maariz.termshark",
   "build": {
     "beforeDevCommand": "bun run dev",
-    "devUrl": "http://localhost:1420",
     "beforeBuildCommand": "bun run build",
-    "frontendDist": "../dist"
+    "devUrl": "http://localhost:3000",
+    "frontendDist": "../out"
   },
   "app": {
     "windows": [
       {
-        "title": "termshark",
+        "title": "Termshark",
         "width": 800,
         "height": 600
       }

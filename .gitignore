@@ -25,3 +25,5 @@ dist-ssr
 
 # Devenv State Files
 .devenv/
+
+.next/

@@ -22,6 +22,5 @@
     shellcheck.enable = true;
     prettier.enable = true;
     nixfmt.enable = true;
-    rustfmt.enable = true;
   };
 }
