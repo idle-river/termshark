@@ -1,5 +1,11 @@
 import { AppPageShell } from "@/components/app-page-shell";
+import { FloatingAddButton } from "@/components/floating-add-button";
 
 export default function Page() {
-  return <AppPageShell title="Home" />;
+  return (
+    <>
+      <FloatingAddButton ariaLabel="Add SSH Host" />
+      <AppPageShell title="Home" />
+    </>
+  );
 }

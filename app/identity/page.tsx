@@ -1,6 +1,7 @@
 "use client";
 
 import { AppPageShell } from "@/components/app-page-shell";
+import { FloatingAddButton } from "@/components/floating-add-button";
 import { toast } from "@/components/ui/toast";
 import { invoke } from "@tauri-apps/api/core";
 import { useQuery } from "@tanstack/react-query";
@@ -40,6 +41,7 @@ export default function IdentityPage() {
       {keys.map((key) => (
         <p key={key.id}>{key.label}</p>
       ))}
+      <FloatingAddButton ariaLabel="Add identity key" />
     </AppPageShell>
   );
 }
