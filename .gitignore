@@ -27,3 +27,8 @@ dist-ssr
 .devenv/
 
 .next/
+
+.env*
+!.env.example
+
+termshark.db

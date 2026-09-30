@@ -4,7 +4,11 @@
 }:
 
 {
-  packages = with pkgs; [ bun ];
+  packages = with pkgs; [
+    bun
+    cargo-watch
+    diesel-cli
+  ];
 
   languages.rust = {
     enable = true;
