@@ -8,7 +8,10 @@
     bun
     cargo-watch
     diesel-cli
+    sqlite
   ];
+
+  dotenv.enable = true;
 
   languages.rust = {
     enable = true;
