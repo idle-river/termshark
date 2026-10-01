@@ -1,10 +1,12 @@
 use diesel::{Connection, RunQueryDsl, SelectableHelper, SqliteConnection};
 use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
 use dotenvy::dotenv;
+use tauri::Manager;
 
 use crate::models::Key;
 mod models;
 mod schema;
+mod terminal;
 
 #[tauri::command]
 fn get_keys() -> Result<Vec<Key>, String> {
@@ -90,9 +92,22 @@ fn establish_connection() -> SqliteConnection {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .setup(|app| {
+            use terminal::*;
+            let terminal = start_terminal(app.handle().clone()).expect("failed to start terminal");
+
+            app.manage(terminal);
+
+            Ok(())
+        })
         .plugin(tauri_plugin_opener::init())
         .invoke_handler(tauri::generate_handler![
-            get_keys, create_key, update_key, delete_key
+            get_keys,
+            create_key,
+            update_key,
+            delete_key,
+            terminal::write_to_terminal,
+            terminal::resize_terminal,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
