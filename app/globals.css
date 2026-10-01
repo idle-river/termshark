@@ -127,3 +127,21 @@
     @apply font-sans;
   }
 }
+
+.terminal-surface .xterm {
+  height: 100%;
+  padding: 0.75rem;
+  background-color: rgb(0 0 0);
+}
+
+.terminal-surface .xterm-viewport {
+  background-color: rgb(0 0 0);
+}
+
+.terminal-surface .xterm-screen {
+  width: 100%;
+}
+
+.terminal-surface .xterm-selection div {
+  background-color: rgb(45 212 191 / 25%);
+}
