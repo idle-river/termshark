@@ -11,7 +11,7 @@ function Providers({ children }: { children: React.ReactNode }) {
   return (
     <>
       <QueryProvider>
-        <Toaster />
+        <Toaster position="top-right" />
         <TooltipProvider>{children}</TooltipProvider>
       </QueryProvider>
     </>

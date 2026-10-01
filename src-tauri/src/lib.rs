@@ -40,6 +40,41 @@ fn create_key(label: String, pubkey: String, privkey: String) -> Result<Key, Str
         .map_err(|e| e.to_string())
 }
 
+#[tauri::command]
+fn update_key(key_id: i32, label: String, pubkey: String, privkey: String) -> Result<Key, String> {
+    use self::schema::keys::dsl::{
+        id, keys, label as key_label, privkey as key_privkey, pubkey as key_pubkey,
+    };
+    use diesel::ExpressionMethods;
+    use diesel::QueryDsl;
+
+    let conn = &mut establish_connection();
+
+    diesel::update(keys.filter(id.eq(key_id)))
+        .set((
+            key_label.eq(label),
+            key_pubkey.eq(pubkey),
+            key_privkey.eq(privkey),
+        ))
+        .returning(Key::as_returning())
+        .get_result(conn)
+        .map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+fn delete_key(key_id: i32) -> Result<(), String> {
+    use self::schema::keys::dsl::*;
+    use diesel::ExpressionMethods;
+    use diesel::QueryDsl;
+
+    let conn = &mut establish_connection();
+
+    diesel::delete(keys.filter(id.eq(key_id)))
+        .execute(conn)
+        .map_err(|e| e.to_string())?;
+    Ok(())
+}
+
 const MIGRATIONS: EmbeddedMigrations = embed_migrations!();
 
 fn establish_connection() -> SqliteConnection {
@@ -56,7 +91,9 @@ fn establish_connection() -> SqliteConnection {
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
-        .invoke_handler(tauri::generate_handler![get_keys, create_key])
+        .invoke_handler(tauri::generate_handler![
+            get_keys, create_key, update_key, delete_key
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
