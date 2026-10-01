@@ -123,7 +123,9 @@ export default function IdentityPage() {
               <Input
                 id="identity-label"
                 value={label}
-                onChange={(event) => setLabel(event.target.value)}
+                onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                  setLabel(event.target.value)
+                }
                 placeholder="Work laptop"
                 autoFocus
               />
@@ -134,7 +136,9 @@ export default function IdentityPage() {
               <Input
                 id="identity-public-key"
                 value={pubkey}
-                onChange={(event) => setPubkey(event.target.value)}
+                onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                  setPubkey(event.target.value)
+                }
                 placeholder="ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAA... your-email@example.com"
                 className="font-mono"
               />
@@ -160,7 +164,9 @@ export default function IdentityPage() {
               <Textarea
                 id="identity-private-key"
                 value={privkey}
-                onChange={(event) => setPrivkey(event.target.value)}
+                onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
+                  setPrivkey(event.target.value)
+                }
                 placeholder="-----BEGIN OPENSSH PRIVATE KEY-----"
                 className="min-h-40 font-mono"
               />
