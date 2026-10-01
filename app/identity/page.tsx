@@ -15,8 +15,13 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { invoke } from "@tauri-apps/api/core";
-import { useQuery } from "@tanstack/react-query";
-import { useRef, useState, type ChangeEvent } from "react";
+import {
+  useIsFetching,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
+import { useEffect, useRef, useState, type ChangeEvent } from "react";
 
 type Key = {
   id: number;
@@ -30,6 +35,8 @@ export default function IdentityPage() {
   const [label, setLabel] = useState("");
   const [pubkey, setPubkey] = useState("");
   const [privkey, setPrivkey] = useState("");
+  const queryClient = useQueryClient();
+  const isFetchingKeys = useIsFetching({ queryKey: ["keys"] });
   const pubFileInputRef = useRef<HTMLInputElement>(null);
   const privFileInputRef = useRef<HTMLInputElement>(null);
 
@@ -41,12 +48,60 @@ export default function IdentityPage() {
     queryKey: ["keys"],
     queryFn: async () => {
       try {
+        console.info("[identity] fetching keys");
         return await invoke<Key[]>("get_keys");
       } catch (err) {
         const message = err instanceof Error ? err.message : String(err);
+        console.error("[identity] failed to fetch keys:", message);
         toast.error(message);
         throw new Error(message);
       }
+    },
+  });
+
+  const { mutateAsync: addKey } = useMutation({
+    mutationKey: ["keys"],
+    mutationFn: async ({
+      label,
+      pubkey,
+      privkey,
+    }: {
+      label: string;
+      pubkey: string;
+      privkey: string;
+    }) => {
+      try {
+        console.info("[identity] creating key", { label });
+        return await invoke("create_key", { label, pubkey, privkey });
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        console.error("[identity] failed to create key:", message);
+        throw err;
+      }
+    },
+    onSuccess: async () => {
+      const before = queryClient.getQueryState<Key[]>(["keys"]);
+      console.info("[identity] key created, invalidating keys query", {
+        beforeStatus: before?.status,
+        beforeFetchStatus: before?.fetchStatus,
+        beforeDataUpdatedAt: before?.dataUpdatedAt,
+      });
+
+      await queryClient.invalidateQueries({
+        queryKey: ["keys"],
+        refetchType: "all",
+      });
+
+      const after = queryClient.getQueryState<Key[]>(["keys"]);
+      console.info("[identity] invalidation finished", {
+        afterStatus: after?.status,
+        afterFetchStatus: after?.fetchStatus,
+        afterDataUpdatedAt: after?.dataUpdatedAt,
+      });
+    },
+    onError: (err) => {
+      const message = err instanceof Error ? err.message : String(err);
+      console.error("[identity] mutation error:", message);
     },
   });
 
@@ -81,6 +136,17 @@ export default function IdentityPage() {
     event.target.value = "";
   };
 
+  useEffect(() => {
+    console.info("[identity] keys state updated", {
+      keyCount: keys.length,
+      labels: keys.map((key) => key.label),
+    });
+  }, [keys]);
+
+  useEffect(() => {
+    console.info("[identity] keys query fetching count", { isFetchingKeys });
+  }, [isFetchingKeys]);
+
   return (
     <>
       <AppPageShell>
@@ -109,9 +175,14 @@ export default function IdentityPage() {
 
           <form
             className="space-y-4"
-            onSubmit={(event) => {
+            onSubmit={async (event) => {
               event.preventDefault();
-              toast.info("Key creation will be wired next.");
+              await toast.promise(addKey({ label, pubkey, privkey }), {
+                pending: "Adding key...",
+                success: "Key added successfully.",
+                error: (err) =>
+                  err instanceof Error ? err.message : String(err),
+              });
               setShow(false);
               setLabel("");
               setPubkey("");
