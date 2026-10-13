@@ -3,10 +3,25 @@ use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
 use dotenvy::dotenv;
 use tauri::Manager;
 
-use crate::models::Key;
+use crate::models::{Host, Key};
 mod models;
 mod schema;
 mod terminal;
+
+#[tauri::command]
+fn get_hosts() -> Result<Vec<Host>, String> {
+    use self::schema::hosts::dsl::*;
+    use diesel::QueryDsl;
+
+    let conn = &mut establish_connection();
+
+    let res = hosts
+        .select(Host::as_select())
+        .load(conn)
+        .map_err(|err| err.to_string())?;
+
+    Ok(res)
+}
 
 #[tauri::command]
 fn get_keys() -> Result<Vec<Key>, String> {
@@ -106,6 +121,7 @@ pub fn run() {
             create_key,
             update_key,
             delete_key,
+            get_hosts,
             terminal::write_to_terminal,
             terminal::resize_terminal,
         ])
